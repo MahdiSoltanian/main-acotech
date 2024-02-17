@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from account_moudel.models import User
+
+
 def profile_view(request):
     phone_number = request.session.get('phone_number')
     if phone_number:

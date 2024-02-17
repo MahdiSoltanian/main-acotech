@@ -40,22 +40,22 @@
 CKEDITOR.plugins.add('wpmore', {
     requires: ['fakeobjects'],
 
-    getPlaceholderCss : function () {
+    getPlaceholderCss: function () {
         return 'img.cke_wordpress_more'
-             + '{'
-                 + 'background-image: url(' + CKEDITOR.getUrl(this.path + 'images/more_bug.gif') + ');'
-                 + 'background-position: right center;'
-                 + 'background-repeat: no-repeat;'
-                 + 'clear: both;'
-                 + 'display: block;'
-                 + 'float: none;'
-                 + 'width: 100%;'
-                 + 'border-top: #999999 1px dotted;'
-                 + 'height: 10px;'
-             + '}'
+            + '{'
+            + 'background-image: url(' + CKEDITOR.getUrl(this.path + 'images/more_bug.gif') + ');'
+            + 'background-position: right center;'
+            + 'background-repeat: no-repeat;'
+            + 'clear: both;'
+            + 'display: block;'
+            + 'float: none;'
+            + 'width: 100%;'
+            + 'border-top: #999999 1px dotted;'
+            + 'height: 10px;'
+            + '}'
     },
 
-    onLoad : function () {
+    onLoad: function () {
         // version 4 - add the styles that renders our fake objects
         if (CKEDITOR.addCss) {
             CKEDITOR.addCss(this.getPlaceholderCss());
@@ -65,7 +65,7 @@ CKEDITOR.plugins.add('wpmore', {
     init: function (editor) {
         // version 3 - add the styles that renders our fake objects
         if (editor.addCss) {
-            editor.addCss( this.getPlaceholderCss() );
+            editor.addCss(this.getPlaceholderCss());
         }
 
         // Register the toolbar buttons.
@@ -81,11 +81,11 @@ CKEDITOR.plugins.add('wpmore', {
                 // There should be only one <!--more--> tag in document. So, look
                 // for an image with class "cke_wordpress_more" (the fake element).
                 var images = editor.document.getElementsByTag('img');
-                for (var i = 0, len = images.count() ; i < len ; i++ ) {
+                for (var i = 0, len = images.count(); i < len; i++) {
                     var img = images.getItem(i);
                     if (img.hasClass('cke_wordpress_more')) {
                         var msg = 'The document already contains a more. '
-                                + 'Do you want to proceed by removing it first?'
+                            + 'Do you want to proceed by removing it first?'
                         if (confirm(msg)) {
                             img.remove();
                             break;
@@ -100,14 +100,15 @@ CKEDITOR.plugins.add('wpmore', {
         });
 
         // This function effectively inserts the comment into the editor.
-        function insertComment(text)
-        {
+        function insertComment(text) {
             // Create the fake element that will be inserted into the document.
             // The trick is declaring it as an <hr>, so it will behave like a
             // block element (and in effect it behaves much like an <hr>).
             if (!CKEDITOR.dom.comment.prototype.getAttribute) {
-                CKEDITOR.dom.comment.prototype.getAttribute = function () { return ''; };
-                CKEDITOR.dom.comment.prototype.attributes = { align: '' };
+                CKEDITOR.dom.comment.prototype.getAttribute = function () {
+                    return '';
+                };
+                CKEDITOR.dom.comment.prototype.attributes = {align: ''};
             }
             var fakeElement = editor.createFakeElement(
                 new CKEDITOR.dom.comment(text),
@@ -137,7 +138,7 @@ CKEDITOR.plugins.add('wpmore', {
             // Commented out to prevent wrapping of blocks before and after More tag
             // Split the current block.
             // if (!hasMoved) {
-                // range.splitBlock('span');
+            // range.splitBlock('span');
             // }
 
             // Insert the fake element into the document.
@@ -161,8 +162,10 @@ CKEDITOR.plugins.add('wpmore', {
         editor.dataProcessor.dataFilter.addRules({
             comment: function (value) {
                 if (!CKEDITOR.htmlParser.comment.prototype.getAttribute) {
-                    CKEDITOR.htmlParser.comment.prototype.getAttribute = function() { return ''; };
-                    CKEDITOR.htmlParser.comment.prototype.attributes = { align: '' };
+                    CKEDITOR.htmlParser.comment.prototype.getAttribute = function () {
+                        return '';
+                    };
+                    CKEDITOR.htmlParser.comment.prototype.attributes = {align: ''};
                 }
                 if (value == 'more') {
                     return editor.createFakeParserElement(

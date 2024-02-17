@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
-from .forms import RegisterForm,LoginForm
+from .forms import RegisterForm, LoginForm
 from .models import User
 from django.utils.crypto import get_random_string
+
+
 class RegisterView(View):
     def get(self, request):
         register_form = RegisterForm()
@@ -12,7 +14,7 @@ class RegisterView(View):
             'register_form': register_form
         }
 
-        return render(request,'register.html',context)
+        return render(request, 'register.html', context)
 
     def post(self, request):
         register_form = RegisterForm(request.POST)
@@ -22,19 +24,21 @@ class RegisterView(View):
             user_name = register_form.cleaned_data.get('name')
             user_password = register_form.cleaned_data.get('password')
             print(user_phoneNumber)
-            user:bool = User.objects.filter(phone_number=user_phoneNumber).exists()
+            user: bool = User.objects.filter(phone_number=user_phoneNumber).exists()
             if user:
-                register_form.add_error('phone_number','this phone_number does exist')
+                register_form.add_error('phone_number', 'this phone_number does exist')
             else:
-                new_user = User(phone_number=user_phoneNumber,email_active_code=get_random_string(80),name=user_name,password=user_password)
+                new_user = User(phone_number=user_phoneNumber, email_active_code=get_random_string(80), name=user_name,
+                                password=user_password)
 
                 new_user.save()
                 return redirect(reverse('login_page'))
         context = {
-            'register_form' : register_form
+            'register_form': register_form
         }
 
-        return render(request,'register.html',context)
+        return render(request, 'register.html', context)
+
 
 from django.shortcuts import render, redirect
 
@@ -54,4 +58,3 @@ def login_view(request):
             return render(request, 'login.html', {'error_message': 'Invalid username or password'})
     else:
         return render(request, 'login.html')
-

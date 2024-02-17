@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('account_moudel', '0003_alter_user_options_remove_user_email_and_more'),
     ]

@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -17,7 +16,8 @@ class Migration(migrations.Migration):
             name='UserProfile',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('user', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, to='account_moudel.user')),
+                ('user', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE,
+                                              to='account_moudel.user')),
             ],
         ),
     ]
