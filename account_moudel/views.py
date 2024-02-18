@@ -4,8 +4,6 @@ from django.views import View
 from .forms import RegisterForm, LoginForm
 from .models import User
 from django.utils.crypto import get_random_string
-
-
 class RegisterView(View):
     def get(self, request):
         register_form = RegisterForm()
@@ -43,8 +41,8 @@ class RegisterView(View):
 from django.shortcuts import render, redirect
 
 
-def login_view(request):
-    if request.method == 'POST':
+class loginview(View):
+    def post(self,request):
         phone_number = request.POST.get('phone_number')
         password = request.POST.get('password')
         try:
@@ -56,5 +54,5 @@ def login_view(request):
             return redirect('admin-page')  # Redirect to home page or any other page after login
         else:
             return render(request, 'login.html', {'error_message': 'Invalid username or password'})
-    else:
-        return render(request, 'login.html')
+    def get(self,request):
+                return render(request, 'login.html')
