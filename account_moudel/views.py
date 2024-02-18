@@ -43,18 +43,22 @@ class RegisterView(View):
 from django.shortcuts import render, redirect
 
 
-def login_view(request):
-    if request.method == 'POST':
+class loginview(View):
+    def post(self, request):
         phone_number = request.POST.get('phone_number')
         password = request.POST.get('password')
+        name = request.POST.get('name')
+        #print(name)
         try:
-            user = User.objects.get(phone_number=phone_number, password=password)
+            user = User.objects.get(phone_number=phone_number, password=password,name=name)
         except User.DoesNotExist:
             user = None
         if user is not None:
             request.session['phone_number'] = phone_number  # Store username in session
+            request.session['name'] = name
             return redirect('admin-page')  # Redirect to home page or any other page after login
         else:
             return render(request, 'login.html', {'error_message': 'Invalid username or password'})
-    else:
+
+    def get(self, request):
         return render(request, 'login.html')
