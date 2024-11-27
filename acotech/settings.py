@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'account_moudel',
-    'index_moudel'
+    'index_moudel',
 ]
 
 MIDDLEWARE = [
@@ -71,13 +71,18 @@ WSGI_APPLICATION = 'acotech.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+import os
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE':   'django.db.backends.mysql', 
+        'NAME':     os.getenv("MYSQL_DB_NAME"), 
+        'USER':     os.getenv("MYSQL_DB_USER"),
+        'PASSWORD': os.getenv("MYSQL_DB_PASS"),
+        'HOST':     os.getenv("MYSQL_DB_HOST"),
+        'PORT':     os.getenv("MYSQL_DB_PORT"),
+    },
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -118,5 +123,6 @@ STATICFILES_DIRS = [
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
