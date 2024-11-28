@@ -1,12 +1,15 @@
 import http
-from sms_ir import SmsIr
+from datetime import datetime
+from random import random
 
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
-from .forms import RegisterForm, LoginForm
-from .models import User
-from django.utils.crypto import get_random_string
+from sms_ir import SmsIr
+
+from account_moudel.forms import RegisterForm
+from account_moudel.models import User, OTP
 
 
 class RegisterView(View):
@@ -68,25 +71,47 @@ class loginview(View):
 from django.shortcuts import render
 from django.http import HttpResponse
 
-def verify_number(request):
+
+
+
+# تنظیمات پیامک
+SMS_API_KEY = 'wRNDA4QMO2I1S75PaIXEhupIugrpWjIAsDPjOzi1jNGfSHGg'
+
+def send_otp(user):
+    otp_code = str(random.randint(100000, 999999))  # تولید کد ۶ رقمی
+    otp, created = OTP.objects.get_or_create(user=user)
+    otp.code = otp_code
+    otp.created_at = datetime.now()
+    otp.save()
+
+    # ارسال پیامک
+    sms = SmsIr(API_KEY=SMS_API_KEY)
+    sms.send({'MobileNumbers': [user.profile.phone_number], 'Messages': [f"کد ورود شما: {otp_code}"]})
+
+@login_required
+def send_login_otp(request):
+    user = request.user
+    send_otp(user)
+    return render(request, 'otp_sent.html')  # صفحه‌ای که به کاربر اطلاع دهد پیامک ارسال شده
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import OTP
+
+@login_required
+def verify_otp(request):
     if request.method == 'POST':
-        code = request.POST.get('verification_code')
-        sms_ir = SmsIr(
-            api_key="wRNDA4QMO2I1S75PaIXEhupIugrpWjIAsDPjOzi1jNGfSHGg",
-        
-            linenumber= 30007487129352,
-        )
-        sms_ir.send_verify_code(
-        numbers= '+989130923984',
-        template_id=471084,
-        parameters=[
-            {
-            "name" : "code",
-            "value": "12345"
-            }
-        ]
-    )
+        user = request.user
+        code = request.POST.get('otp')
 
-        return HttpResponse("Code submitted: " + code)
-    return render(request, 'varify.html')
+        try:
+            otp = OTP.objects.get(user=user, code=code)
+            if otp.is_valid():
+                messages.success(request, "ورود با موفقیت انجام شد!")
+                return redirect('home')  # صفحه اصلی
+            else:
+                messages.error(request, "کد منقضی شده است.")
+        except OTP.DoesNotExist:
+            messages.error(request, "کد وارد شده نادرست است.")
 
+    return render(request, 'verify_otp.html')

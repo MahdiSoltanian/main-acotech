@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<form method="post">
+    {% csrf_token %}
+    <label for="otp">کد تأیید:</label>
+    <input type="text" id="otp" name="otp" required>
+    <button type="submit">تأیید</button>
+</form>
