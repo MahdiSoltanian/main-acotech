@@ -77,11 +77,11 @@ def verify_number(request):
             linenumber= 30007487129352,
         )
         sms_ir.send_verify_code(
-        number="phone_number",
-        template_id=10000,
+        number= phone_number
+        template_id=471084,
         parameters=[
             {
-            "CODE" : "CODE",
+            "name" : "Code",
             "value": "12345"
             }
         ]
