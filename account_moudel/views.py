@@ -77,7 +77,7 @@ def verify_number(request):
             linenumber= 30007487129352,
         )
         sms_ir.send_verify_code(
-        number= phone_number
+        number= '+989130923984'
         template_id=471084,
         parameters=[
             {
