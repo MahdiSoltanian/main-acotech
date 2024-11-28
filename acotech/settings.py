@@ -74,14 +74,15 @@ WSGI_APPLICATION = 'acotech.wsgi.application'
 import os
 DATABASES = {
     'default': {
-        'ENGINE':   'django.db.backends.mysql', 
-        'NAME':     os.getenv("MYSQL_DB_NAME"), 
-        'USER':     os.getenv("MYSQL_DB_USER"),
-        'PASSWORD': os.getenv("MYSQL_DB_PASS"),
-        'HOST':     os.getenv("MYSQL_DB_HOST"),
-        'PORT':     os.getenv("MYSQL_DB_PORT"),
-    },
+        'ENGINE': 'django.db.backends.mysql',  # Use MySQL backend
+        'NAME': 'strange_mcnulty',               # Database name
+        'USER': 'root',             # MySQL user
+        'PASSWORD': 'CyfAeAIPbolQC0jcpMMeLOfn',     # MySQL user's password
+        'HOST': 'k2.liara.cloud',                  # Database host (default: localhost)
+        'PORT': '30713',                       # Default MySQL port
+    }
 }
+
 
 
 # Password validation
