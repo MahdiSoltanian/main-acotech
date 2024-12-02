@@ -1,18 +1,21 @@
 import http
 from datetime import datetime
 from random import random
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 from sms_ir import SmsIr
-from otp_moudel import templates
-
 from account_moudel.forms import RegisterForm
 from account_moudel.models import User
+from django.shortcuts import render, redirect
+from django.shortcuts import render
+from django.http import JsonResponse
+from .sms_utils import send_verification_code
+import random
 
 
+'----------------------------------------------------------'
 class RegisterView(View):
     def get(self, request):
         register_form = RegisterForm()
@@ -45,10 +48,7 @@ class RegisterView(View):
 
         return render(request, 'register.html', context)
 
-
-from django.shortcuts import render, redirect
-
-
+'----------------------------------------------------------'
 class loginview(View):
 
     def post(self, request):
@@ -70,12 +70,7 @@ class loginview(View):
     def get(self, request):
         return render(request, 'login.html')
 
-
-from django.shortcuts import render
-from django.http import JsonResponse
-from .sms_utils import send_verification_code
-import random
-from account_moudel.templates import *
+'----------------------------------------------------------'
 def send_code_view(request):
     if request.method == 'POST':
         phone_number = request.POST.get('phone_number')  # دریافت شماره تلفن
@@ -86,6 +81,7 @@ def send_code_view(request):
         return JsonResponse({'status': 'success', 'message': 'کد تایید ارسال شد'})
     return JsonResponse({'status': 'error', 'message': 'روش ارسال نامعتبر است'})
 
+'----------------------------------------------------------'
 def verify_code_view(request):
     if request.method == 'POST':
         entered_code = request.POST.get('code')  # کدی که کاربر وارد کرده
@@ -94,4 +90,6 @@ def verify_code_view(request):
             return JsonResponse({'status': 'success', 'message': 'کد تایید شد'})
         return JsonResponse({'status': 'error', 'message': 'کد اشتباه است'})
     return JsonResponse({'status': 'error', 'message': 'روش ارسال نامعتبر است'})
+'----------------------------------------------------------'
+
 
