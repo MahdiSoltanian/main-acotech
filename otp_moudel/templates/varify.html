@@ -1,10 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    </style>
 </head>
 <body>
-$END$
+    <div class="container">
+        <h1>Enter Verification Code</h1>
+        <form id="verification-form" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="phone">varify code</label>
+                <input type="text" id="code" name="code" placeholder="Enter your code" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Send Code</button>
+            </div>
+            {% if message %}
+                <div class="message">{{ message }}</div>
+            {% endif %}
+            {% if error %}
+                <div class="message error">{{ error }}</div>
+            {% endif %}
+        </form>
+    </div>
 </body>
 </html>

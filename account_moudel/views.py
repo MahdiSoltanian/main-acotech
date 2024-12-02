@@ -68,50 +68,64 @@ class loginview(View):
 
     def get(self, request):
         return render(request, 'login.html')
-from django.shortcuts import render
-from django.http import HttpResponse
 
+    import random
+    import requests
+    from django.http import JsonResponse
+    from django.views.decorators.csrf import csrf_exempt
+    from django.core.cache import cache
 
+    # تنظیمات کاوه نگار
+    KAVEHNEGAR_API_KEY = "your_kaveh_negar_api_key"  # کلید API کاوه نگار
+    CACHE_TIMEOUT = 300  # زمان انقضا برای ذخیره کد تأیید در حافظه (ثانیه)
 
+    def send_verification_code(phone_number):
+        """
+        ارسال کد تأیید به شماره موبایل
+        """
+        verification_code = random.randint(100000, 999999)  # تولید کد ۶ رقمی
+        cache.set(phone_number, verification_code, CACHE_TIMEOUT)  # ذخیره کد در حافظه موقت
 
-# تنظیمات پیامک
-SMS_API_KEY = 'wRNDA4QMO2I1S75PaIXEhupIugrpWjIAsDPjOzi1jNGfSHGg'
+        url = f"https://api.kavenegar.com/v1/{KAVEHNEGAR_API_KEY}/sms/send.json"
+        data = {
+            "receptor": phone_number,
+            "message": f"کد تأیید شما: {verification_code}"
+        }
+        response = requests.post(url, data=data)
+        return response.json()
 
-def send_otp(user):
-    otp_code = str(random.randint(100000, 999999))  # تولید کد ۶ رقمی
-    otp, created = OTP.objects.get_or_create(user=user)
-    otp.code = otp_code
-    otp.created_at = datetime.now()
-    otp.save()
+    @csrf_exempt
+    def send_code_view(request):
+        """
+        ویوی ارسال کد تأیید
+        """
+        if request.method == "POST":
+            phone_number = request.POST.get("phone_number")
+            if not phone_number:
+                return JsonResponse({"success": False, "message": "شماره موبایل ارسال نشده است."})
 
-    # ارسال پیامک
-    sms = SmsIr(API_KEY=SMS_API_KEY)
-    sms.send({'MobileNumbers': [user.profile.phone_number], 'Messages': [f"کد ورود شما: {otp_code}"]})
-
-@login_required
-def send_login_otp(request):
-    user = request.user
-    send_otp(user)
-    return render(request, 'otp_sent.html')  # صفحه‌ای که به کاربر اطلاع دهد پیامک ارسال شده
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import OTP
-
-@login_required
-def verify_otp(request):
-    if request.method == 'POST':
-        user = request.user
-        code = request.POST.get('otp')
-
-        try:
-            otp = OTP.objects.get(user=user, code=code)
-            if otp.is_valid():
-                messages.success(request, "ورود با موفقیت انجام شد!")
-                return redirect('home')  # صفحه اصلی
+            response = send_verification_code(phone_number)
+            if response.get("return", {}).get("status") == 200:
+                return JsonResponse({"success": True, "message": "کد تأیید ارسال شد."})
             else:
-                messages.error(request, "کد منقضی شده است.")
-        except OTP.DoesNotExist:
-            messages.error(request, "کد وارد شده نادرست است.")
+                return JsonResponse({"success": False, "message": "ارسال پیامک با خطا مواجه شد."})
+        return JsonResponse({"success": False, "message": "فقط درخواست POST پشتیبانی می‌شود."})
 
-    return render(request, 'verify_otp.html')
+    @csrf_exempt
+    def verify_code_view(request):
+        """
+        ویوی تأیید کد
+        """
+        if request.method == "POST":
+            phone_number = request.POST.get("phone_number")
+            entered_code = request.POST.get("code")
+
+            if not phone_number or not entered_code:
+                return JsonResponse({"success": False, "message": "اطلاعات کامل ارسال نشده است."})
+
+            saved_code = cache.get(phone_number)
+            if saved_code and str(saved_code) == str(entered_code):
+                return JsonResponse({"success": True, "message": "کد تأیید صحیح است."})
+            else:
+                return JsonResponse({"success": False, "message": "کد تأیید نادرست است."})
+        return JsonResponse({"success": False, "message": "فقط درخواست POST پشتیبانی می‌شود."})
