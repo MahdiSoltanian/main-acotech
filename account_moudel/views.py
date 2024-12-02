@@ -70,63 +70,28 @@ class loginview(View):
     def get(self, request):
         return render(request, 'login.html')
 
-    import random
-    import requests
-    from django.http import JsonResponse
-    from django.views.decorators.csrf import csrf_exempt
-    from django.core.cache import cache
 
-    # تنظیمات کاوه نگار
-    KAVEHNEGAR_API_KEY = "your_kaveh_negar_api_key"  # کلید API کاوه نگار
-    CACHE_TIMEOUT = 300  # زمان انقضا برای ذخیره کد تأیید در حافظه (ثانیه)
+from django.shortcuts import render
+from django.http import JsonResponse
+from .sms_utils import send_verification_code
+import random
+from account_moudel.templates import *
+def send_code_view(request):
+    if request.method == 'POST':
+        phone_number = request.POST.get('phone_number')  # دریافت شماره تلفن
+        code = random.randint(100000, 999999)  # تولید کد ۶ رقمی تصادفی
+        # ذخیره کد در دیتابیس یا کش (برای بررسی در مرحله بعد)
+        request.session['verification_code'] = code
+        send_verification_code(phone_number, code)
+        return JsonResponse({'status': 'success', 'message': 'کد تایید ارسال شد'})
+    return JsonResponse({'status': 'error', 'message': 'روش ارسال نامعتبر است'})
 
-    def send_verification_code(phone_number):
-        """
-        ارسال کد تأیید به شماره موبایل
-        """
-        verification_code = random.randint(100000, 999999)  # تولید کد ۶ رقمی
-        cache.set(phone_number, verification_code, CACHE_TIMEOUT)  # ذخیره کد در حافظه موقت
+def verify_code_view(request):
+    if request.method == 'POST':
+        entered_code = request.POST.get('code')  # کدی که کاربر وارد کرده
+        original_code = request.session.get('verification_code')  # کدی که ذخیره شده
+        if str(entered_code) == str(original_code):
+            return JsonResponse({'status': 'success', 'message': 'کد تایید شد'})
+        return JsonResponse({'status': 'error', 'message': 'کد اشتباه است'})
+    return JsonResponse({'status': 'error', 'message': 'روش ارسال نامعتبر است'})
 
-        url = f"https://api.kavenegar.com/v1/{KAVEHNEGAR_API_KEY}/sms/send.json"
-        data = {
-            "receptor": phone_number,
-            "message": f"کد تأیید شما: {verification_code}"
-        }
-        response = requests.post(url, data=data)
-        return response.json()
-
-    @csrf_exempt
-    def send_code_view(request):
-        """
-        ویوی ارسال کد تأیید
-        """
-        if request.method == "POST":
-            phone_number = request.POST.get("phone_number")
-            if not phone_number:
-                return JsonResponse({"success": False, "message": "شماره موبایل ارسال نشده است."})
-
-            response = send_verification_code(phone_number)
-            if response.get("return", {}).get("status") == 200:
-                return JsonResponse({"success": True, "message": "کد تأیید ارسال شد."})
-            else:
-                return JsonResponse({"success": False, "message": "ارسال پیامک با خطا مواجه شد."})
-        return JsonResponse({"success": False, "message": "فقط درخواست POST پشتیبانی می‌شود."})
-
-    @csrf_exempt
-    def verify_code_view(request):
-        """
-        ویوی تأیید کد
-        """
-        if request.method == "POST":
-            phone_number = request.POST.get("phone_number")
-            entered_code = request.POST.get("code")
-
-            if not phone_number or not entered_code:
-                return JsonResponse({"success": False, "message": "اطلاعات کامل ارسال نشده است."})
-
-            saved_code = cache.get(phone_number)
-            if saved_code and str(saved_code) == str(entered_code):
-                return JsonResponse({"success": True, "message": "کد تأیید صحیح است."})
-            else:
-                return JsonResponse({"success": False, "message": "کد تأیید نادرست است."})
-        return JsonResponse({"success": False, "message": "فقط درخواست POST پشتیبانی می‌شود."})
