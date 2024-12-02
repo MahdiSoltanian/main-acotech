@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ConfirmPhoneConfig(AppConfig):
+class OtpMoudelConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'confirm_phone'
+    name = 'otp_moudel'
