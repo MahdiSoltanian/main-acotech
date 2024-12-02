@@ -9,7 +9,7 @@ from django.views import View
 from sms_ir import SmsIr
 
 from account_moudel.forms import RegisterForm
-from account_moudel.models import User, OTP
+from account_moudel.models import User
 
 
 class RegisterView(View):
