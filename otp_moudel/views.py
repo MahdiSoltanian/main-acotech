@@ -15,6 +15,7 @@ def send_code_view(request):
 
 def verify_code_view(request):
     if request.method == 'POST':
+        return render(request,'varify.html')
         entered_code = request.POST.get('code')  # کدی که کاربر وارد کرده
         original_code = request.session.get('verification_code')  # کدی که ذخیره شده
         if str(entered_code) == str(original_code):

@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 from sms_ir import SmsIr
+from otp_moudel import templates
 
 from account_moudel.forms import RegisterForm
 from account_moudel.models import User
