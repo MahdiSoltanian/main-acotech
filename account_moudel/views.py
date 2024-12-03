@@ -1,6 +1,8 @@
 from random import random
 from django.urls import reverse
 from django.views import View
+from rest_framework.views import APIView
+
 from account_moudel.forms import RegisterForm
 from account_moudel.models import User
 from django.shortcuts import render, redirect
@@ -8,6 +10,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from .sms_utils import send_verification_code
 import random
+from kavenegar import *
 
 
 '----------------------------------------------------------'
@@ -60,31 +63,47 @@ class loginview(View):
             request.session['name'] = name
             return redirect('varify_number')  # Redirect to home page or any other page after login
         else:
-            return render(request, 'varify.html', {'error_message': 'Invalid username or password'})
+            return render(request, 'login.html', {'error_message': 'Invalid username or password'})
 
     def get(self, request):
         return render(request, 'login.html')
 
 '----------------------------------------------------------'
-def send_code_view(request):
-    if request.method == 'POST':
-        phone_number = request.POST.get('phone_number')  # دریافت شماره تلفن
-        code = random.randint(100000, 999999)  # تولید کد ۶ رقمی تصادفی
-        # ذخیره کد در دیتابیس یا کش (برای بررسی در مرحله بعد)
-        request.session['verification_code'] = code
-        send_verification_code(phone_number, code)
-        return JsonResponse({'status': 'success', 'message': 'کد تایید ارسال شد'})
-    return JsonResponse({'status': 'error', 'message': 'روش ارسال نامعتبر است'})
+'''
+class GenerateOTP(APIView):
+    serializer_class = GetOTP
+
+    def post(self, request, format=None):
+        ser = self.serializer_class(
+            data=request.data,
+            context={'request': request}
+        )
+        if ser.is_valid():
+            ...
+            token = randint(100000, 999999)
+            kave_negar_token_send(ser.data['phone_number'], token)
+            ...
 
 '----------------------------------------------------------'
-def verify_code_view(request):
-    if request.method == 'POST':
-        entered_code = request.POST.get('code')  # کدی که کاربر وارد کرده
-        original_code = request.session.get('verification_code')  # کدی که ذخیره شده
-        if str(entered_code) == str(original_code):
-            return JsonResponse({'status': 'success', 'message': 'کد تایید شد'})
-        return JsonResponse({'status': 'error', 'message': 'کد اشتباه است'})
-    return JsonResponse({'status': 'error', 'message': 'روش ارسال نامعتبر است'})
-'----------------------------------------------------------'
 
+API_KEY = '356F2F386B49427250374934354B4C4744475A6C4649452B6C6E74762F4D77635A6376612B4E4674586C303D'
+def kave_negar_token_send(receptor, token):
+    try:
+        api = KavenegarAPI(API_KEY)
+        params = {
+            'receptor': receptor,
+            'template': 'your_template',
+            'token': token
+        }
+        response = api.verify_lookup(params)
+    except APIException as e:
+        print(e)
+    except HTTPException as e:
+        print(e)
 
+token = random.randint(1000, 9999)
+token = random.randint(10000, 99999)
+token = random.randint(100000, 999999)
+token = random.randint(1000, 9999)
+kave_negar_token_send(ser.data['phone_number'], token)
+'''

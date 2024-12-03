@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'account_moudel',
     'index_moudel',
+    'api_moudel'
 ]
 
 MIDDLEWARE = [
