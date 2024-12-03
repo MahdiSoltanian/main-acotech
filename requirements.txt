@@ -3,4 +3,4 @@ Django
 MySQL
 requests
 djangorestframework
-kavehnegar
+kavenegar
