@@ -2,3 +2,4 @@ smsir-python
 Django
 MySQL
 requests
+djangorestframework
