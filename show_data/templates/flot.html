@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #chart-container {
+            width: 80%;
+            margin: auto;
+        }
+        canvas {
+            max-width: 100%;
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center;">Sensor Data Chart</h1>
+    <div id="chart-container">
+        <canvas id="sensorChart"></canvas>
+    </div>
+
+    <script>
+        // Fetch data from the Django backend
+        async function fetchSensorData() {
+            const response = await fetch('/myapp/api/data/'); // Update the API endpoint path if necessary
+            const data = await response.json();
+
+            // Extract timestamps, temperatures, and humidity values
+            const labels = data.map(entry => new Date(entry.timestamp).toLocaleString());
+            const temperatures = data.map(entry => entry.temperature);
+            const humidity = data.map(entry => entry.humidity);
+
+            return { labels, temperatures, humidity };
+        }
+
+        // Render the chart
+        async function renderChart() {
+            const { labels, temperatures, humidity } = await fetchSensorData();
+
+            const ctx = document.getElementById('sensorChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line', // Line chart
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Temperature (°C)',
+                            data: temperatures,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            fill: true,
+                        },
+                        {
+                            label: 'Humidity (%)',
+                            data: humidity,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: true,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Timestamp',
+                            },
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Value',
+                            },
+                        },
+                    },
+                },
+            });
+        }
+
+        // Call the render function
+        renderChart();
+    </script>
+</body>
+</html>
