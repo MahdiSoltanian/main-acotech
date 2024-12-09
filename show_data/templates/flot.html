@@ -34,7 +34,7 @@
 
     // Function to fetch data and update the chart
     async function fetchTemperatureData() {
-      const response = await fetch('/show/');
+      const response = await fetch('/api/');
       const data = await response.json();
 
       temperatureChart.data.labels = data.timestamps.reverse();
