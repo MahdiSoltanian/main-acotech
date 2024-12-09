@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'account_moudel',
     'index_moudel',
     'api_moudel',
-    'rest_framework'
+    'rest_framework',
+    'show_data'
 ]
 
 MIDDLEWARE = [
