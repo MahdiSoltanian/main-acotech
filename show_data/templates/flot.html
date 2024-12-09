@@ -17,7 +17,7 @@
       data: {
         labels: [],
         datasets: [{
-          label: 'Temperature',
+          label: 'temp',
           data: [],
           borderColor: 'rgba(75, 192, 192, 1)',
           borderWidth: 1,
@@ -26,15 +26,15 @@
       },
       options: {
         scales: {
-          x: { title: { display: true, text: 'Timestamp' } },
-          y: { title: { display: true, text: 'Temperature (°C)' } }
+          x: { title: { display: true, text: 'id' } },
+          y: { title: { display: true, text: 'temp (°C)' } }
         }
       }
     });
 
     // Function to fetch data and update the chart
     async function fetchTemperatureData() {
-      const response = await fetch('/chart/temperature-data/');
+      const response = await fetch('/show/');
       const data = await response.json();
 
       temperatureChart.data.labels = data.timestamps.reverse();
