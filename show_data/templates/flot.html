@@ -29,20 +29,20 @@
     <script>
         // Fetch data from the Django backend
         async function fetchSensorData() {
-            const response = await fetch('/myapp/api/data/'); // Update the API endpoint path if necessary
+            const response = await fetch('/api/'); // Update the API endpoint path if necessary
             const data = await response.json();
 
             // Extract timestamps, temperatures, and humidity values
-            const labels = data.map(entry => new Date(entry.timestamp).toLocaleString());
-            const temperatures = data.map(entry => entry.temperature);
-            const humidity = data.map(entry => entry.humidity);
+            const temperatures = data.map(entry => entry.temp);
+            const sensor_Name = data.map(entry => entry.sensor_Name);
+            const api_Key_Name = data.map(entry => entry.api_Key_Name);
 
-            return { labels, temperatures, humidity };
+            return { temperatures, sensor_Name, api_Key_Name };
         }
 
         // Render the chart
         async function renderChart() {
-            const { labels, temperatures, humidity } = await fetchSensorData();
+            const { sensor_Name, temperatures, api_Key_Name } = await fetchSensorData();
 
             const ctx = document.getElementById('sensorChart').getContext('2d');
             new Chart(ctx, {
@@ -51,15 +51,15 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Temperature (°C)',
+                            label: 'temperatures',
                             data: temperatures,
                             borderColor: 'rgba(255, 99, 132, 1)',
                             backgroundColor: 'rgba(255, 99, 132, 0.2)',
                             fill: true,
                         },
                         {
-                            label: 'Humidity (%)',
-                            data: humidity,
+                            label: 'sensor_Name',
+                            data: sensor_Name,
                             borderColor: 'rgba(54, 162, 235, 1)',
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
                             fill: true,
@@ -72,7 +72,7 @@
                         x: {
                             title: {
                                 display: true,
-                                text: 'Timestamp',
+                                text: 'api_Key_Name',
                             },
                         },
                         y: {
