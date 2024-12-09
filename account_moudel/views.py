@@ -61,7 +61,7 @@ class loginview(View):
         if user is not None:
             request.session['phone_number'] = phone_number  # Store username in session
             request.session['name'] = name
-            return redirect('varify_number')  # Redirect to home page or any other page after login
+            return redirect('admin-page')  # Redirect to home page or any other page after login
         else:
             return render(request, 'login.html', {'error_message': 'Invalid username or password'})
 
