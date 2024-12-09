@@ -1,93 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Data Chart</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #chart-container {
-            width: 80%;
-            margin: auto;
-        }
-        canvas {
-            max-width: 100%;
-            max-height: 500px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Temperature Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1 style="text-align:center;">Sensor Data Chart</h1>
-    <div id="chart-container">
-        <canvas id="sensorChart"></canvas>
-    </div>
+  <h1>Live Temperature Chart</h1>
+  <canvas id="temperatureChart" width="400" height="200"></canvas>
 
-    <script>
-        // Fetch data from the Django backend
-        async function fetchSensorData() {
-            const response = await fetch('/api/'); // Update the API endpoint path if necessary
-            const data = await response.json();
-
-            // Extract timestamps, temperatures, and humidity values
-            const temperatures = data.map(entry => entry.temp);
-            const sensor_Name = data.map(entry => entry.sensor_Name);
-            const api_Key_Name = data.map(entry => entry.api_Key_Name);
-
-            return { temperatures, sensor_Name, api_Key_Name };
+  <script>
+    const ctx = document.getElementById('temperatureChart').getContext('2d');
+    const temperatureChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Temperature',
+          data: [],
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1,
+          tension: 0.4
+        }]
+      },
+      options: {
+        scales: {
+          x: { title: { display: true, text: 'Timestamp' } },
+          y: { title: { display: true, text: 'Temperature (°C)' } }
         }
+      }
+    });
 
-        // Render the chart
-        async function renderChart() {
-            const { sensor_Name, temperatures, api_Key_Name } = await fetchSensorData();
+    // Function to fetch data and update the chart
+    async function fetchTemperatureData() {
+      const response = await fetch('/chart/temperature-data/');
+      const data = await response.json();
 
-            const ctx = document.getElementById('sensorChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line', // Line chart
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'temperatures',
-                            data: temperatures,
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            fill: true,
-                        },
-                        {
-                            label: 'sensor_Name',
-                            data: sensor_Name,
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            fill: true,
-                        },
-                    ],
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'api_Key_Name',
-                            },
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Value',
-                            },
-                        },
-                    },
-                },
-            });
-        }
+      temperatureChart.data.labels = data.timestamps.reverse();
+      temperatureChart.data.datasets[0].data = data.values.reverse();
+      temperatureChart.update();
+    }
 
-        // Call the render function
-        renderChart();
-    </script>
+    // Fetch data every 5 seconds
+    setInterval(fetchTemperatureData, 5000);
+    fetchTemperatureData(); // Initial fetch
+  </script>
 </body>
 </html>
